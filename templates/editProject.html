@@ -1,0 +1,15 @@
+{% extends "main.html" %}
+{% block content %}
+
+    <div class="container">
+        <form method="POST" action="{{url_for('editProject', projectId=p.id)}}">
+            <label for="name">Task Name:</label>
+            <input type="text" name="name" placeholder="{{p.name}}"><br>
+            <label for="description">Description:</label>
+            <input type="text" name="description" placeholder="{{p.description}}"><br>
+            <input type="hidden" name="project_id" value="{{p.id}}"><br>
+            <input type="submit" value="Create">
+        </form>
+    </div>
+
+{% endblock %}

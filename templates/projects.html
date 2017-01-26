@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+
+
+<div class="create-project">
+    <a href='/createProject'>Create A New Project</a>
+</div>
+
+    {% if projects %}
+<div id='projects' class="projects-wrapper">
+    {% for p in projects %}
+    <div data-project-id="{{p.id}}"  class="row project">
+        <div class="eight columns">
+            <h4><a class="project-title" href="{{url_for('viewProject', projectId=p.id)}}">{{p.name}}</a></h4>
+        </div>
+        <div class="four columns">
+            <a href="{{p.link}}">View Project Website</a>
+        </div>
+        <p class="twelve columns">{{p.description}}</p>
+    </div>
+    {% endfor %}
+</div>
+    {% endif %}
+
+{% endblock %}

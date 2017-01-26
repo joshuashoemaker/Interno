@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='normalize.css') }}">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='skeleton.css') }}">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+		<link href="//fonts.googleapis.com/css?family=Raleway:300,600,900" rel="stylesheet" type="text/css">
+		
+   		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+		<script type="text/javascript" src="//platform.linkedin.com/in.js">
+			api_key: 782y24ef76dvw5
+			authorize: true
+			onLoad: onLinkedInLoad
+		</script>
+
+		<script type="text/javascript">
+    
+			// Setup an event listener to make an API call once auth is complete
+			function onLinkedInLoad() {
+				IN.Event.on(IN, "auth", getProfileData);
+			}
+
+			// Handle the successful return from the API call
+			function onSuccess(data) {
+				console.log(data);
+
+				$.ajax({
+					type: 'POST',
+					url: '/auth/linkedin?state={{STATE}}',
+					processData: false,
+					data: JSON.stringify(data),
+					contentType: 'application/json; charset=utf-8',
+					success: function(result) {
+						// Handle or verify the server response if necessary.
+						if (result) {
+							console.log(result);
+							$('#firstName').html(data.firstName);
+							$('#lastName').html(data.lastName);
+							$('#email').html(data.emailAddress);
+							setTimeout(function() {
+							window.location.href = "/";
+						}, 4000);
+					} 
+					else if (authResult['error']) {
+
+					console.log('There was an error: ' + authResult['error']);
+				} 
+				else {
+						$('#result').html('Failed to make a server-side call. Check your configuration and console.');
+						}
+					}
+				});
+			}
+
+			// Handle an error response from the API call
+			function onError(error) {
+				console.log(error);
+			}
+
+			// Use the API call wrapper to request the member's basic profile data
+			function getProfileData() {
+				IN.API.Raw("/people/~:(id,first-name,last-name,picture-url,email-address)")
+					.result(onSuccess)
+					.error(onError);
+			}
+
+
+		</script>
+
+	</head>
+	<body>
+		<div class="container">
+			<header>
+			<div class="six columns">
+				<h1>Interno</h1>
+			</div>
+			<div class="six columns" style="text-align: right">
+					
+				
+			</div>
+			</header>
+		</div>
+		<div class="container">
+
+			<div class="container">
+				<span id="firstName">First Name</span><br>
+				<span id="lastName">Last Name</span><br>
+				<span id="email">Email Address</span><br>
+			</div>
+			{% block content %}
+			{% endblock %}
+		</div>
+	</body>
+</html>

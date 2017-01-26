@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+{% block content %}
+
+
+<h4>{{p.name}}</h4>
+
+<div class="description">
+    <p>{{p.description}}</p>
+    {% if p.creator_id == user_id %}
+    <a href="{{url_for('editProject', projectId=p.id)}}">Edit Project</a><br>
+    <a href="{{url_for('confirmDeleteProject', projectId=p.id)}}">Delete Project</a>
+    {% endif %}
+</div>
+
+
+<div class="create-project">
+    <a href="{{url_for('createTask', projectId=p.id)}}">Create A New Task</a>
+</div>
+
+{%if tasks%}
+<div class="container tasks-wrapper">
+    {% for t in tasks %}
+    <div class="task">
+        <h5 class="task-name">{{t.name}}</h5>
+        <p class="task-description">{{t.description}}</p>
+        <div class='edit-task'>
+            <a href="{{url_for('editTask', projectId=p.id, taskId=t.id)}}" class="ion ion-edit"></a>
+            <a href="{{url_for('confirmDeleteTask', projectId=p.id, taskId=t.id)}}" class="ion ion-trash-a"></a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+{% endblock %}

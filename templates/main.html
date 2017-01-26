@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='normalize.css') }}">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='skeleton.css') }}">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+		<link href="//fonts.googleapis.com/css?family=Raleway:300,600,900" rel="stylesheet" type="text/css">
+		<link href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+
+	</head>
+	<body>
+		<div class="container">
+			<header>
+			<div class="six columns">
+				<h1>Garage Project</h1>
+			</div>
+			<div class="six columns" style="text-align: right">
+					{%if 'email' not in session %}
+					<a href="{{url_for('showLogin')}}">Click Here to Login </a>
+					<script type="in/Login"></script>
+					{% else %}
+					<a href="{{url_for('disconnect')}}">Logout </a>
+					{% endif %}
+				
+			</div>
+			</header>
+		</div>
+		<div class="container">
+			{% block content %}
+			{% endblock %}
+		</div>
+	</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends "main.html" %}
+{% block content %}
+
+    <div class="container">
+        <form method="POST" action="{{url_for('deleteProject', projectId=p.id)}}">
+            <input type="hidden" name="project_id" value="{{p.id}}">
+            Are you sure you would like to delete <strong>{{p.name}}</strong> and all of its tasks?
+            <input type="submit" value="Yes">
+        </form>
+    </div>
+
+{%endblock%}
