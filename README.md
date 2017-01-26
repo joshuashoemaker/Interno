@@ -1,5 +1,5 @@
-#Garage Project
-Garage Project is a web application intended for the internal use of an organization, company,
+#Interno
+Interno is a web application intended for the internal use of an organization, company,
  or team to create share ideas of passion projects that team members might wish to collaborate
  on to either learn new skills, keep enthusiasm burning for their profession, or get create 
  examples of new ideas their company or organization might wish to explore.
