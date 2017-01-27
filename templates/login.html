@@ -20,6 +20,7 @@
     
 			// Setup an event listener to make an API call once auth is complete
 			function onLinkedInLoad() {
+				console.log('onLinkedInLoad')
 				IN.Event.on(IN, "auth", getProfileData);
 			}
 
@@ -62,12 +63,11 @@
 
 			// Use the API call wrapper to request the member's basic profile data
 			function getProfileData() {
+				console.log('OnGetProfileData')
 				IN.API.Raw("/people/~:(id,first-name,last-name,picture-url,email-address)")
 					.result(onSuccess)
 					.error(onError);
 			}
-
-
 		</script>
 
 	</head>
@@ -80,15 +80,16 @@
 			<div class="six columns" style="text-align: right">
 					
 				
+					<script type="in/Login"></script>
 			</div>
 			</header>
 		</div>
 		<div class="container">
 
 			<div class="container">
-				<span id="firstName">First Name</span><br>
-				<span id="lastName">Last Name</span><br>
-				<span id="email">Email Address</span><br>
+				<span id="firstName"></span><br>
+				<span id="lastName"></span><br>
+				<span id="email"></span><br>
 			</div>
 			{% block content %}
 			{% endblock %}
