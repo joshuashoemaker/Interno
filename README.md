@@ -4,6 +4,8 @@ Interno is a web application intended for the internal use of an organization, c
  on to either learn new skills, keep enthusiasm burning for their profession, or get create 
  examples of new ideas their company or organization might wish to explore.
 
+ Requires a validated email with a LinkedIn account.
+
 ##Current features
 As of now users can log in using LinkedIn OAuth2, create Projects and assign tasks to this project. 
 The creator of the project or of the task may delete or update the task.
