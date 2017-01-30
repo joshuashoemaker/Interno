@@ -142,6 +142,11 @@ def editProject(projectId):
         return redirect('login')
 
     edited_project = session.query(Project).filter_by(id=projectId).one()
+    user_id = getUserID(login_session['email'])
+
+    if edited_project.creator_id != user_id:
+        return redirect(url_for('viewProject', projectId=projectId))
+
     if request.method == 'POST':
         if request.form['name']:
             edited_project.name = request.form['name']
@@ -161,13 +166,17 @@ def confirmDeleteProject(projectId):
 
     if not isLoggedIn(login_session):
         return redirect('login')
+    
+    user_id = getUserID(login_session['email'])
+    project = session.query(Project).filter_by(id=projectId).one()
+
+    if project.creator_id != user_id:
+        return redirect(url_for('viewProject', projectId=projectId))
+
+    if user_id == project.creator_id:
+        return render_template('deleteProject.html', p=project)
     else:
-        user_id = getUserID(login_session['email'])
-        project = session.query(Project).filter_by(id=projectId).one()
-        if user_id == project.creator_id:
-            return render_template('deleteProject.html', p=project)
-        else:
-            return redirect(url_for('showProject', projectId=project.id))
+        return redirect(url_for('showProject', projectId=project.id))
 
 
 # delete project from database
@@ -176,16 +185,20 @@ def deleteProject(projectId):
 
     if not isLoggedIn(login_session):
         return redirect('login')
-    else:
-        user_id = getUserID(login_session['email'])
-        project = session.query(Project).filter_by(id=projectId).one()
-        tasks = session.query(Task).filter_by(project_id=project.id).all()
-        if user_id == project.creator_id:
-            session.delete(project)
-            for task in tasks:
-                session.delete(task)
-            session.commit()
+
+    user_id = getUserID(login_session['email'])
+    project = session.query(Project).filter_by(id=projectId).one()
+    tasks = session.query(Task).filter_by(project_id=project.id).all()
+
+    if user_id == project.creator_id:
+        session.delete(project)
+        for task in tasks:
+            session.delete(task)
+        session.commit()
         return redirect(url_for('index'))
+    else:
+        return redirect(url_for('viewProject', projectId=projectId))
+
 
 
 #edit task if user is task creator or project creator
@@ -222,15 +235,16 @@ def confirmDeleteTask(projectId, taskId):
 
     if not isLoggedIn(login_session):
         return redirect('login')
-    else:
-        user_id = getUserID(login_session['email'])
-        project = session.query(Project).filter_by(id=projectId).one()
-        task = session.query(Task).filter_by(id=taskId).one()
+    
+    user_id = getUserID(login_session['email'])
+    project = session.query(Project).filter_by(id=projectId).one()
+    task = session.query(Task).filter_by(id=taskId).one()
 
-        if (user_id == project.creator_id) or (user_id == task.creator_id):
-            return render_template('deleteTask.html', p=project, t=task)
-        else:
-            return redirect(url_for('showProject', projectId=project.id))
+    # if user trying to delete is the creator of the task or project
+    if (user_id == project.creator_id) or (user_id == task.creator_id):
+        return render_template('deleteTask.html', p=project, t=task)
+    else:
+        return redirect(url_for('showProject', projectId=project.id))
 
 
 # delete task from database
@@ -239,21 +253,41 @@ def deleteTask(projectId, taskId):
 
     if not isLoggedIn(login_session):
         return redirect('login')
-    else:
-        user_id = getUserID(login_session['email'])
-        project = session.query(Project).filter_by(id=projectId).one()
-        task = session.query(Task).filter_by(id=taskId).one()
-        if user_id == project.creator_id:
-            session.delete(task)
-            session.commit()
-        return redirect(url_for('index'))
 
+    user_id = getUserID(login_session['email'])
+    project = session.query(Project).filter_by(id=projectId).one()
+    task = session.query(Task).filter_by(id=taskId).one()
+
+    # if user trying to delete is the creator of the task or project
+    if (user_id == project.creator_id) or (user_id == task.creator_id):
+        session.delete(task)
+        session.commit()
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('viewProject', projectId=project.id))
+
+# JSON Endpoints
+@app.route('/api/projects')
+def getProjects():
+    projects = session.query(Project).all()
+    return jsonify(projects=[p.serialize for p in projects])
+
+
+@app.route('/api/project-task/<int:projectId>')
+def getProjectTasks(projectId):
+    project = session.query(Project).filter_by(id=projectId).one()
+    tasks = session.query(Task).filter_by(project_id=projectId).all()
+    return jsonify(project=project.serialize, tasks=[t.serialize for t in tasks])
 
 
 # User Helper Functions
 def createUser(login_session):
-    newUser = User(first_name=login_session['firstName'], last_name=login_session['lastName'], 
-                    email=login_session['email'], picture=login_session['pictureUrl'], title='', bio='')
+    # Bio and title are empty for now until profiles are added
+    newUser = User(first_name=login_session['firstName'], 
+                    last_name=login_session['lastName'], 
+                    email=login_session['email'], 
+                    picture=login_session['pictureUrl'], 
+                    title='', bio='')
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
