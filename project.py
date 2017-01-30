@@ -79,7 +79,7 @@ def disconnect():
 
 
 # create Project if logged in
-@app.route('/createProject', method=['POST', 'GET'])
+@app.route('/createProject', methods=['POST', 'GET'])
 def createProject():
     if not isLoggedIn(login_session):
         return redirect('login')
