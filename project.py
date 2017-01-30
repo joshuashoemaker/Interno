@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect
+from flask import jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Project, Task, Enrollment
@@ -39,7 +40,7 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
-# LinkedIn Auth 
+# LinkedIn Auth
 @app.route('/auth/linkedin', methods=['POST'])
 def linkedInAuth():
     if request.args.get('state') != login_session['state']:
@@ -73,22 +74,22 @@ def disconnect():
         del login_session['pictureUrl']
         del login_session['authProvider']
         return redirect(url_for('index'))
-    else :
+    else:
         return redirect(url_for('index'))
 
 
 # create Project if logged in
-@app.route('/createProject', methods = ['POST', 'GET'])
+@app.route('/createProject', method=['POST', 'GET'])
 def createProject():
     if not isLoggedIn(login_session):
         return redirect('login')
 
     if request.method == 'POST':
-        user_id=getUserID(login_session['email'])
-        new_project = Project(name=request.form['name'], 
-                                description=request.form['description'], 
-                                link=request.form['link'], 
-                                creator_id=user_id)
+        user_id = getUserID(login_session['email'])
+        new_project = Project(name=request.form['name'],
+                              description=request.form['description'],
+                              link=request.form['link'],
+                              creator_id=user_id)
         session.add(new_project)
         session.commit()
         return redirect(url_for('index'))
@@ -97,7 +98,7 @@ def createProject():
 
 
 # create task for a project
-@app.route('/projects/<int:projectId>/createTask', methods = ['POST', 'GET'])
+@app.route('/projects/<int:projectId>/createTask', methods=['POST', 'GET'])
 def createTask(projectId):
     if not isLoggedIn(login_session):
         return redirect('login')
@@ -113,11 +114,14 @@ def createTask(projectId):
         if request.form['description']:
             t_description = request.form['description']
 
-        new_task = Task(name=t_name, description=t_description, 
-                        creator_id=user_id, project_id=request.form['project_id'])
+        new_task = Task(name=t_name,
+                        description=t_description,
+                        creator_id=user_id,
+                        project_id=request.form['project_id'])
         session.add(new_task)
         session.commit()
-        return redirect(url_for('viewProject', projectId=request.form['project_id']))
+        return redirect(url_for('viewProject',
+                        projectId=request.form['project_id']))
     else:
         return render_template('createTask.html', p=project)
 
@@ -125,19 +129,22 @@ def createTask(projectId):
 # view single project
 @app.route('/projects/<int:projectId>')
 def viewProject(projectId):
-    user_id=0
+    user_id = 0
     if isLoggedIn(login_session):
         user_id = getUserID(login_session['email'])
 
     project = session.query(Project).filter_by(id=projectId).one()
     tasks = session.query(Task).filter_by(project_id=project.id).all()
-    return render_template('project.html', p=project, user_id=user_id, tasks=tasks)
+    return render_template('project.html',
+                           p=project,
+                           user_id=user_id,
+                           tasks=tasks)
 
 
 # edit project if project creator
-@app.route('/editProject/<int:projectId>', methods = ['GET', 'POST'])
+@app.route('/editProject/<int:projectId>', methods=['GET', 'POST'])
 def editProject(projectId):
-    
+
     if not isLoggedIn(login_session):
         return redirect('login')
 
@@ -166,7 +173,7 @@ def confirmDeleteProject(projectId):
 
     if not isLoggedIn(login_session):
         return redirect('login')
-    
+
     user_id = getUserID(login_session['email'])
     project = session.query(Project).filter_by(id=projectId).one()
 
@@ -180,7 +187,7 @@ def confirmDeleteProject(projectId):
 
 
 # delete project from database
-@app.route('/deleteProject/<int:projectId>', methods = ["POST"])
+@app.route('/deleteProject/<int:projectId>', methods=["POST"])
 def deleteProject(projectId):
 
     if not isLoggedIn(login_session):
@@ -200,11 +207,11 @@ def deleteProject(projectId):
         return redirect(url_for('viewProject', projectId=projectId))
 
 
-
-#edit task if user is task creator or project creator
-@app.route('/projects/<int:projectId>/editTask/<int:taskId>', methods = ['GET', 'POST'])
+# edit task if user is task creator or project creator
+@app.route('/projects/<int:projectId>/editTask/<int:taskId>',
+           methods=['GET', 'POST'])
 def editTask(projectId, taskId):
-    
+
     if not isLoggedIn(login_session):
         return redirect('login')
 
@@ -235,7 +242,7 @@ def confirmDeleteTask(projectId, taskId):
 
     if not isLoggedIn(login_session):
         return redirect('login')
-    
+
     user_id = getUserID(login_session['email'])
     project = session.query(Project).filter_by(id=projectId).one()
     task = session.query(Task).filter_by(id=taskId).one()
@@ -248,7 +255,7 @@ def confirmDeleteTask(projectId, taskId):
 
 
 # delete task from database
-@app.route('/deleteTask/<int:projectId>/<int:taskId>', methods = ["POST"])
+@app.route('/deleteTask/<int:projectId>/<int:taskId>', methods=["POST"])
 def deleteTask(projectId, taskId):
 
     if not isLoggedIn(login_session):
@@ -266,6 +273,7 @@ def deleteTask(projectId, taskId):
     else:
         return redirect(url_for('viewProject', projectId=project.id))
 
+
 # JSON Endpoints
 @app.route('/api/projects')
 def getProjects():
@@ -277,17 +285,18 @@ def getProjects():
 def getProjectTasks(projectId):
     project = session.query(Project).filter_by(id=projectId).one()
     tasks = session.query(Task).filter_by(project_id=projectId).all()
-    return jsonify(project=project.serialize, tasks=[t.serialize for t in tasks])
+    return jsonify(project=project.serialize,
+                   tasks=[t.serialize for t in tasks])
 
 
 # User Helper Functions
 def createUser(login_session):
     # Bio and title are empty for now until profiles are added
-    newUser = User(first_name=login_session['firstName'], 
-                    last_name=login_session['lastName'], 
-                    email=login_session['email'], 
-                    picture=login_session['pictureUrl'], 
-                    title='', bio='')
+    newUser = User(first_name=login_session['firstName'],
+                   last_name=login_session['lastName'],
+                   email=login_session['email'],
+                   picture=login_session['pictureUrl'],
+                   title='', bio='')
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
