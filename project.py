@@ -183,7 +183,7 @@ def confirmDeleteProject(projectId):
     if user_id == project.creator_id:
         return render_template('deleteProject.html', p=project)
     else:
-        return redirect(url_for('showProject', projectId=project.id))
+        return redirect(url_for('viewProject', projectId=project.id))
 
 
 # delete project from database
@@ -251,7 +251,7 @@ def confirmDeleteTask(projectId, taskId):
     if (user_id == project.creator_id) or (user_id == task.creator_id):
         return render_template('deleteTask.html', p=project, t=task)
     else:
-        return redirect(url_for('showProject', projectId=project.id))
+        return redirect(url_for('viewProject', projectId=project.id))
 
 
 # delete task from database
