@@ -88,7 +88,7 @@ class Enrollment(Base):
 
 
 
-engine = create_engine('postgresql:///garageproject')
+engine = create_engine('postgresql://grader:grader@localhost:5432/garageproject')
  
 
 Base.metadata.create_all(engine)

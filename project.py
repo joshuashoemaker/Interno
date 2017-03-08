@@ -17,7 +17,8 @@ import requests
 app = Flask(__name__)
 
 # Connect to Database and create database session
-engine = create_engine('postgresql:///garageproject.db')
+
+engine = create_engine('postgresql://grader:grader@localhost:5432/garageproject')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
