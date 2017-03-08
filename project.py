@@ -1,3 +1,4 @@
+import psycopg2
 from flask import Flask, render_template, request, redirect
 from flask import jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
@@ -16,7 +17,7 @@ import requests
 app = Flask(__name__)
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///garageproject.db')
+engine = create_engine('postgresql:///garageproject.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)

@@ -1,3 +1,4 @@
+import psycopg2
 from sqlalchemy import Column, ForeignKey, Integer, String, Date, Boolean, Time
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -87,7 +88,7 @@ class Enrollment(Base):
 
 
 
-engine = create_engine('sqlite:///garageproject.db')
+engine = create_engine('postgresql:///garageproject.db')
  
 
 Base.metadata.create_all(engine)
